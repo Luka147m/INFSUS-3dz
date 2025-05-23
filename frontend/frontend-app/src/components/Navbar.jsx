@@ -1,0 +1,14 @@
+import { Link } from 'react-router-dom';
+import './Navbar.css';
+
+const Navbar = () => (
+   <nav className="navbar">
+    <ul className="nav-links">
+      <li><Link to="/">Početna</Link></li>
+      <li><Link to="/masterdetail">Master-detail</Link></li>
+      <li><Link to="/sifrarnik">Sifrarnik</Link></li>
+    </ul>
+  </nav>
+);
+
+export default Navbar;
