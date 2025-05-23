@@ -4,6 +4,7 @@ public class ImenikDTO {
 	private Integer idImenik;
 	private RoditeljDTO roditelj1;
 	private RoditeljDTO roditelj2;
+	private DijeteDTO dijete;
 
 	public Integer getIdImenik() {
 		return idImenik;
