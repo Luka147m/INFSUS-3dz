@@ -20,6 +20,28 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
     program: '',
     napomena: ''
   });
+  const [validationError, setValidationError] = useState('');
+
+  const validateForm = (formData) => {
+      if (!formData.idOdgojitelj || formData.idOdgojitelj.trim() === '') {
+        return 'Odgojitelj je obavezan.';
+      }
+      if (!formData.datum || formData.datum.trim() === '') {
+        return 'Datum je obavezan.';
+      }
+      const danas = new Date();
+      danas.setHours(0,0,0,0); 
+      const uneseniDatum = new Date(formData.datum);
+
+      if (uneseniDatum > danas) {
+        return 'Datum ne smije biti u budućnosti.';
+      }
+      if (!formData.program || formData.program.trim() === '') {
+        return 'Program je obavezan.';
+      }
+      return '';
+};
+
 
   const startEditing = (item) => {
     setEditId(item.idEvidencijskaLista);
@@ -30,6 +52,7 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
   };
 
   const cancelEditing = () => {
+    setValidationError('')
     setEditId(null);
     setEditFormData({});
   };
@@ -40,6 +63,12 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
   };
 
   const saveEdit = () => {
+     const error = validateForm(editFormData);
+      if (error) {
+        setValidationError(error);
+        return;
+      }
+      setValidationError('');
     const updated = {
       ...editFormData,
       prisutan: editFormData.prisutan === 't',
@@ -56,6 +85,13 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
   };
 
   const saveNew = () => {
+    const error = validateForm(newFormData);
+    if (error) {
+      setValidationError(error);
+      return;
+    }
+    setValidationError('');
+
     const newRecord = {
       ...newFormData,
       prisutan: newFormData.prisutan === 't',
@@ -73,6 +109,7 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
 
   const cancelNew = () => {
     setIsAdding(false);
+    setValidationError('')
     setNewFormData({
       idOdgojitelj: '',
       datum: '',
@@ -133,6 +170,11 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
       >
         ➕ Dodaj novi zapis
       </button>
+      {validationError && (
+      <div className="validation-error" style={{ color: 'red', margin: '10px 0' }}>
+        {validationError}
+      </div>
+    )}
 
       <table className="evidencijska-tablica">
         <thead>
