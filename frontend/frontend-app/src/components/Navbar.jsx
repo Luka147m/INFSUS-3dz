@@ -6,7 +6,7 @@ const Navbar = () => (
     <ul className="nav-links">
       <li><Link to="/">Početna</Link></li>
       <li><Link to="/masterdetail">Master-detail</Link></li>
-      <li><Link to="/sifrarnik">Sifrarnik</Link></li>
+      <li><Link to="/sifrarnik">Šifrarnik</Link></li>
     </ul>
   </nav>
 );
