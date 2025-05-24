@@ -7,6 +7,7 @@ const SifrarnikTablica = ()=> {
     const [roditelji, setRoditelji] = useState([]);
     const [editId, setEditId] = useState(null);
     const [isAdding, setIsAdding] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
     const [newFormData, setNewFormData] = useState({
         ime: '',
         prezime: '',
@@ -160,6 +161,17 @@ const SifrarnikTablica = ()=> {
 
     return (
     <div className='sifrarnik-container'>
+      <label className="label-search">
+        Pretraga:
+      <input
+        className="input-search"
+        type="text"
+        placeholder="Pretraži po imenu, prezimenu, zanimanju, radnom mjestu ili OIB-u"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      </label>
+      <br/>
       {error && <div style={{color:'red', marginBottom:8}}>{error}</div>}
       {!isAdding && (
         <button
@@ -245,7 +257,10 @@ const SifrarnikTablica = ()=> {
           </tr>
         </thead>
         <tbody>
-          {roditelji.map(roditelj => (
+          {roditelji
+          .filter(r =>
+            `${r.ime} ${r.prezime} ${r.oib} ${r.zanimanje} ${r.radnoMjesto}`.toLowerCase().includes(searchTerm.toLowerCase())
+          ).map(roditelj => (
             <tr key={roditelj.idRoditelj}>
               <td>{roditelj.idRoditelj}</td>
               <td>{editId === roditelj.idRoditelj ? (
