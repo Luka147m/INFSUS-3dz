@@ -1,0 +1,97 @@
+.master-page {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dijete-section, .evidencija-section {
+  margin-bottom: 2rem;
+}
+
+h2, h3 {
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+.divider {
+  border: none;
+  border-top: 2px solid #eee;
+  margin: 2rem 0;
+}
+
+.evidencijska-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+  padding: 0.5rem;
+}
+
+.evidencijska-tablica {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.evidencijska-tablica thead {
+  background-color: #f7f9fc;
+}
+
+.evidencijska-tablica th,
+.evidencijska-tablica td {
+  padding: 0.5rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.evidencijska-tablica tr:hover {
+  background-color: #e8f0fe;
+}
+
+.evidencijska-tablica input[type="text"],
+.evidencijska-tablica input[type="date"],
+.evidencijska-tablica select {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 0.9rem;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.action-buttons button {
+  border: none;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.action-buttons .edit {
+  background-color: #4caf50;
+  color: white;
+}
+
+.action-buttons .edit:hover {
+  background-color: #388e3c;
+}
+
+.action-buttons .delete {
+  background-color: #d9534f;
+  color: white;
+}
+
+.action-buttons .delete:hover {
+  background-color: #b52b27;
+}

@@ -1,0 +1,39 @@
+.navigator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 0.8rem;       /* Smanjeno sa 1.5rem na 0.8rem da bude bliže gore */
+  padding: 0.3rem 0.8rem;  /* Smanjena padding za manji i kompaktniji izgled */
+  background-color: #f7f9fb;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-size: 0.9rem;       /* Smanjen font da cijeli navigator bude malo manji */
+}
+
+.nav-button {
+  background-color: #4c8bf5;
+  color: white;
+  border: none;
+  padding: 0.4rem 1rem;    /* Smanjena padding gumba */
+  font-size: 0.85rem;      /* Smanjen font gumba */
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.nav-button:hover:not(:disabled) {
+  background-color: #336fd1;
+}
+
+.nav-button:disabled {
+  background-color: #c5d4f4;
+  cursor: not-allowed;
+}
+
+.nav-status {
+  font-size: 0.9rem;       /* Smanjen font za status */
+  font-weight: 500;
+  color: #333;
+}

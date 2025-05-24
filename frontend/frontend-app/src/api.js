@@ -9,23 +9,58 @@ const handleResponse = async (res) => {
   return res.json();
 };
 
+const BASE_URL = 'http://localhost:8080';
+
 export const getDjecaIds = async () => {
-  const res = await fetch('http://localhost:8080/api/djeca/ids');
+  const res = await fetch(`${BASE_URL}/api/djeca/ids`);
   return handleResponse(res);
 };
 
 export const getDijeteById = async (id) => {
-  const res = await fetch(`http://localhost:8080/api/djeca/dijete/${id}`);
+  const res = await fetch(`${BASE_URL}/api/djeca/dijete/${id}`);
   return handleResponse(res);
 };
 
+export const updateDijete = async (dijete) => {
+  const res = await fetch(`${BASE_URL}/api/djeca/dijete/${dijete.idDijete}`, {
+     method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(dijete), 
+  })
+    if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Greška ${res.status}: ${res.statusText} - ${errorText}`);
+  }
+}
+
+export const deleteDijeteById = async (id) => {
+  const res = await fetch(`${BASE_URL}/api/djeca/dijete/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Greška ${res.status}: ${res.statusText} - ${errorText}`);
+  }
+}
+
+export const createDijete = async () => {
+  
+}
+
+export const getRoditelji = async () =>  {
+  const res = await fetch(`${BASE_URL}/api/roditelji`);
+  return res.json();
+}
+
 export const getEvidencijaByDijeteId = async (id) => {
-  const res = await fetch(`http://localhost:8080/api/evidencija/dijete/${id}`);
+  const res = await fetch(`${BASE_URL}/api/evidencija/dijete/${id}`);
   return handleResponse(res);
 };
 
 export const deleteEvidencija = async (id) => {
-  const res = await fetch(`http://localhost:8080/api/evidencija/${id}`, {
+  const res = await fetch(`${BASE_URL}/api/evidencija/${id}`, {
     method: 'DELETE',
   });
   if (!res.ok) {
@@ -33,3 +68,29 @@ export const deleteEvidencija = async (id) => {
     throw new Error(`Greška ${res.status}: ${res.statusText} - ${errorText}`);
   }
 };
+
+export const updateEvidencija = async (evidencija) => {
+  const res = await fetch(`${BASE_URL}/api/evidencija/${evidencija.idEvidencijskaLista}`, {
+     method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(evidencija), 
+  })
+    if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Greška ${res.status}: ${res.statusText} - ${errorText}`);
+  }
+}
+
+export const createEvidencija = async (evidencija) => {
+  const res = await fetch(`${BASE_URL}/api/evidencija/dijete/${evidencija.idDijete}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(evidencija), 
+})
+   return res.json() // !!!!!!!!!!
+
+}
