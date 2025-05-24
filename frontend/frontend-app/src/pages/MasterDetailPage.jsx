@@ -3,14 +3,9 @@ import {
   getDjecaIds,
   getDijeteById,
   updateDijete,
-  deleteDijeteById,
   createDijete,
   getRoditelji,
   getEvidencijaByDijeteId,
-  deleteEvidencija,
-  updateEvidencija,
-  createEvidencija
-
 } from '../api';
 
 import '../styles/MasterDetailPage.css';
@@ -30,6 +25,24 @@ const MasterDetailPage = () => {
   const [roditelji, setRoditelji] = useState([]);
   const [editingEvidencija, setEditingEvidencija] = useState(null);
 
+
+  const validateImePrezime = (value) => /^[A-Za-zčćžšđČĆŽŠĐ -]{1,50}$/.test(value);
+    const validateDatum = (value) => !!value; 
+    const validateMjesto = (value) => value && value.length <= 50;
+    const validateAdresa = (value) => value && value.length <= 100;
+    const validateOIB = (value) => /^\d{11}$/.test(value);
+    const validateMBO = (value) => /^\d{9}$/.test(value); 
+  
+    const validateForm = (form) => {
+    if (!validateImePrezime(form.ime)) return 'Ime smije sadržavati samo slova, razmake i crticu, max 50 znakova.';
+    if (!validateImePrezime(form.prezime))  return 'Prezime smije sadržavati samo slova, razmake i crticu, max 50 znakova.';
+    if (!validateDatum(form.datumRodenja)) return 'Datum rođenja je obavezan.';
+    if (!validateMjesto(form.mjestoRodenja)) return 'Mjesto rođenja mora biti ispravno (max 50 znakova).';
+    if (!validateAdresa(form.adresaStanovanja)) return 'Adresa mora biti ispravna (max 100 znakova).';
+    if (!validateOIB(form.oib)) return 'OIB mora imati točno 11 znamenki.';
+    if (!validateMBO(form.mbo)) return 'MBO mora imati točno 9 znamenki.';
+    return null; 
+  };
 
   const loadData = async (id) => {
     try {
@@ -80,14 +93,16 @@ const MasterDetailPage = () => {
       .catch(err => console.error('Greška prilikom dohvaćanja roditelja:', err));
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+
 
   const handleSave = async () => {
     if (!formData) {
         console.error('formData je undefined!');
+        return;
+      }
+     const validationError = validateForm(formData);
+      if (validationError) {
+        toast.error(validationError);
         return;
       }
 
@@ -107,8 +122,9 @@ const MasterDetailPage = () => {
           idRoditelj1: Number(formData.roditelj1Id) || null,
           idRoditelj2: Number(formData.roditelj2Id) || null,
         };
+      
         if (!toSave.idDijete) {
-          const message = await createDijete(toSave);
+          await createDijete(toSave);
           toast.success('Dijete uspješno dodano!');
           const newIds = await getDjecaIds();
           setIds(newIds);
@@ -127,88 +143,6 @@ const MasterDetailPage = () => {
     }
   };
 
-  const handleCancel = () => {
-    setFormData({
-      ...dijete,
-      roditelj1Id: dijete.imenik?.roditelj1?.idRoditelj || '',
-      roditelj2Id: dijete.imenik?.roditelj2?.idRoditelj || ''
-    });
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteDijeteById(id);
-      const newIds = ids.filter(i => i !== id);
-      setIds(newIds);
-      setCurrentIndex(0);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleCreateDijete = async () => {
-    const novo = {
-      idDijete: null,
-      ime: '',
-      prezime: '',
-      oib: '',
-      datumRodenja: '',
-      mjestoRodenja: '',
-      adresaStanovanja: '',
-      mbo: '',
-      idSkupina: '',
-      roditelj1Id: '',
-      roditelj2Id: '',
-    };
-    setFormData(novo);
-    setDijete(null); 
-  }
-  
-
-
-  const handleEditEvidencija = (item) => {
-    setEditingEvidencija(item);
-  };
-
-const handleSaveEvidencija = async (updated) => {
-  try {
-    await updateEvidencija(updated);
-    toast.success('Evidencija uspješno ažurirana!');
-
-    setEvidencija(prev => prev.map(el =>
-      el.idEvidencijskaLista === updated.idEvidencijskaLista ? updated : el
-    ));
-    setEditingEvidencija(null);
-  } catch (err) {
-    console.error('Greška pri spremanju evidencije:', err);
-    toast.error('Došlo je do pogreške prilikom spremanja promjena!');
-
-  }
-};
-
-
-const handleDeleteEvidencija = (id) => {
-              deleteEvidencija(id)
-                .then(() => setEvidencija(prev => prev.filter(el => el.idEvidencijskaLista !== id)))
-                .catch(err => console.error('Greška pri brisanju:', err));
-}
-
-const handleAddEvidencija = async (newRecord) => {
-  console.log(newRecord)
-  try {
-    const maxId = evidencija.reduce((max, el) => (el.idEvidencijskaLista > max ? el.idEvidencijskaLista : max), 0);
-    const recordWithId = { ...newRecord, idEvidencijskaLista: maxId + 1,     };
-    const recordWithIdChild = {...recordWithId, idDijete: dijete.idDijete,}
-    await createEvidencija(recordWithIdChild);
-    toast.success('Evidencija uspješno kreirana!')
-    setEvidencija(prev => [...prev, recordWithId]);
-  } catch (err) {
-    console.error('Greška pri dodavanju novog zapisa:', err);
-    toast.error('Došlo je do pogreške!')
-
-  }
-};
-
 
   if (!formData) return <p>Učitavanje...</p>;
 
@@ -220,12 +154,14 @@ const handleAddEvidencija = async (newRecord) => {
         <h2>Dijete #{ids[currentIndex]}</h2>
         <Dijete
           formData={formData}
+          dijete={dijete}
+          ids={ids}
+          setIds={setIds}
           roditelji={roditelji}
-          handleChange={handleChange}
+          setCurrentIndex={setCurrentIndex}
+          setFormData={setFormData}
+          setDijete={setDijete}
           handleSave={handleSave}
-          handleCancel={handleCancel}
-          onDelete={handleDelete}
-          handleCreate={handleCreateDijete}
         />
       </section>
 
@@ -235,10 +171,10 @@ const handleAddEvidencija = async (newRecord) => {
         <h3>Evidencijska lista</h3>
         <EvidencijskaListaTable
             lista={evidencija}
-            onEdit={handleEditEvidencija}
-            onDelete={handleDeleteEvidencija}
-            onSave={handleSaveEvidencija}
-            onAdd={handleAddEvidencija}
+            evidencija={evidencija}
+            dijete={dijete}
+            setEvidencija={setEvidencija} 
+            setEditingEvidencija={setEditingEvidencija}
         />
       </section>
     </div>

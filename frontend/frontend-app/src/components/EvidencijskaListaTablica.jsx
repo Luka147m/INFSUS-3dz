@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import '../styles/EvidencijskaListaTablica.css'
+import { toast } from 'react-toastify';
 
-const EvidencijskaListaTablica = ({ lista, onEdit, onDelete, onSave, onAdd }) => {
+import '../styles/EvidencijskaListaTablica.css'
+import {
+  updateEvidencija,
+  deleteEvidencija,
+  createEvidencija
+
+} from '../api';
+
+const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, setEditingEvidencija}) => {
   const [editId, setEditId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
   const [isAdding, setIsAdding] = useState(false);
@@ -36,7 +44,8 @@ const EvidencijskaListaTablica = ({ lista, onEdit, onDelete, onSave, onAdd }) =>
       ...editFormData,
       prisutan: editFormData.prisutan === 't',
     };
-    onSave(updated);
+    console.log(updated)
+    handleSave(updated);
     setEditId(null);
     setEditFormData({});
   };
@@ -47,12 +56,11 @@ const EvidencijskaListaTablica = ({ lista, onEdit, onDelete, onSave, onAdd }) =>
   };
 
   const saveNew = () => {
-    // Pretvori prisutan u boolean
     const newRecord = {
       ...newFormData,
       prisutan: newFormData.prisutan === 't',
     };
-    onAdd(newRecord);
+    handleAddEvidencija(newRecord);
     setIsAdding(false);
     setNewFormData({
       idOdgojitelj: '',
@@ -74,6 +82,48 @@ const EvidencijskaListaTablica = ({ lista, onEdit, onDelete, onSave, onAdd }) =>
     });
   };
 
+  const handleSave = async (updated) => {
+    try {
+      await updateEvidencija(updated);
+      toast.success('Evidencija uspješno ažurirana!');
+  
+      setEvidencija(prev => prev.map(el =>
+        el.idEvidencijskaLista === updated.idEvidencijskaLista ? updated : el
+      ));
+      setEditingEvidencija(null);
+    } catch (err) {
+      console.error('Greška pri spremanju evidencije:', err);
+      toast.error('Došlo je do pogreške prilikom spremanja promjena!');
+  
+    }
+  };
+
+  const handleEditEvidencija = (item) => {
+    setEditingEvidencija(item);
+  };
+
+  
+  const handleDeleteEvidencija = (id) => {
+    deleteEvidencija(id)
+      .then(() => setEvidencija(prev => prev.filter(el => el.idEvidencijskaLista !== id)))
+      .catch(err => console.error('Greška pri brisanju:', err));
+  }
+
+  const handleAddEvidencija = async (newRecord) => {
+    console.log(newRecord)
+    try {
+      const maxId = evidencija.reduce((max, el) => (el.idEvidencijskaLista > max ? el.idEvidencijskaLista : max), 0);
+      const recordWithId = { ...newRecord, idEvidencijskaLista: maxId + 1,     };
+      const recordWithIdChild = {...recordWithId, idDijete: dijete.idDijete,}
+      await createEvidencija(recordWithIdChild);
+      toast.success('Evidencija uspješno kreirana!')
+      setEvidencija(prev => [...prev, recordWithId]);
+    } catch (err) {
+      console.error('Greška pri dodavanju novog zapisa:', err);
+      toast.error('Došlo je do pogreške!')
+    }
+  };
+  
   return (
     <div className="evidencijska-container">
       <button
@@ -207,7 +257,7 @@ const EvidencijskaListaTablica = ({ lista, onEdit, onDelete, onSave, onAdd }) =>
                 ) : (
                   <>
                     <button className="edit" onClick={() => startEditing(item)}>✏️</button>
-                    <button className="delete" onClick={() => onDelete(item.idEvidencijskaLista)}>🗑️</button>
+                    <button className="delete" onClick={() => handleDeleteEvidencija(item.idEvidencijskaLista)}>🗑️</button>
                   </>
                 )}
               </td>
