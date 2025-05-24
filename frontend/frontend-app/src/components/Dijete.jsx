@@ -1,7 +1,7 @@
 import React from 'react';
 import '../styles/Dijete.css';
 
-const Dijete = ({ formData, roditelji, handleChange, handleSave, handleCancel, handleDelete, handleCreate }) => {
+const Dijete = ({ formData, roditelji, handleChange, handleSave, handleCancel, onDelete, handleCreate }) => {
   if (!formData) return <p>Odaberi dijete za prikaz detalja.</p>;
 
   return (
@@ -81,7 +81,7 @@ const Dijete = ({ formData, roditelji, handleChange, handleSave, handleCancel, h
           </button>
           <button
             className="button delete"
-            onClick={() => handleDelete(formData.idDijete)}
+            onClick={() => onDelete(formData.idDijete)}
           >
             Obriši dijete
           </button>

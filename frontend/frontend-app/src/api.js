@@ -55,7 +55,21 @@ export const deleteDijeteById = async (id) => {
   }
 };
 
-export const createDijete = async () => {};
+export const createDijete = async (dijete) => {
+   const res = await fetch(
+    `${BASE_URL}/api/djeca`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dijete),
+    }
+  );
+  if (!res.ok) throw new Error('Neuspješno dodavanje djeteta');
+  const message = await res.text();
+  return message
+};
 
 export const getRoditelji = async () => {
   const res = await fetch(`${BASE_URL}/api/roditelji`);
@@ -105,7 +119,6 @@ export const createEvidencija = async (evidencija) => {
       body: JSON.stringify(evidencija),
     }
   );
-  return res.json(); // !!!!!!!!!!
 };
 
 export const createRoditelj = async (roditelj) => {

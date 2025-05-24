@@ -6,6 +6,9 @@ import Navbar from './components/Navbar';
 import logo from './logo.svg';
 import './App.css';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
   return (
     <Router>
@@ -15,6 +18,7 @@ function App() {
         <Route path="/masterdetail" element={<MasterDetailPage />} />
         <Route path="/sifrarnik" element={<SifrarnikPage />} />
       </Routes>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </Router>
   );
 }

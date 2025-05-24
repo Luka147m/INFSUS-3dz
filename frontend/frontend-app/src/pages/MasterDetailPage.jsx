@@ -4,6 +4,7 @@ import {
   getDijeteById,
   updateDijete,
   deleteDijeteById,
+  createDijete,
   getRoditelji,
   getEvidencijaByDijeteId,
   deleteEvidencija,
@@ -17,6 +18,7 @@ import '../styles/MasterDetailPage.css';
 import Navigator from '../components/Navigator';
 import Dijete from '../components/Dijete';
 import EvidencijskaListaTable from '../components/EvidencijskaListaTablica';
+import { toast } from 'react-toastify';
 
 
 const MasterDetailPage = () => {
@@ -83,6 +85,11 @@ const MasterDetailPage = () => {
   };
 
   const handleSave = async () => {
+    if (!formData) {
+        console.error('formData je undefined!');
+        return;
+      }
+
     try {
       const { roditelj1Id, roditelj2Id, ...rest } = formData; // izdvoji nepotrebna polja
 
@@ -99,11 +106,23 @@ const MasterDetailPage = () => {
           idRoditelj1: Number(formData.roditelj1Id) || null,
           idRoditelj2: Number(formData.roditelj2Id) || null,
         };
-      console.log(toSave)
-      await updateDijete(toSave);
-      setDijete(toSave);
+        if (!toSave.idDijete) {
+          const message = await createDijete(toSave);
+          toast.success('Dijete uspješno dodano!');
+          const newIds = await getDjecaIds();
+          setIds(newIds);
+          const newIndex = newIds.length - 1;
+          setCurrentIndex(newIndex); 
+          await loadData(newIds[newIndex]); // učitaj novo dijete
+
+        } else {
+          await updateDijete(toSave);
+          toast.success('Dijete uspješno ažurirano!');
+          setDijete(toSave);
+    }
     } catch (err) {
       console.error(err);
+      toast.error('Došlo je do greške prilikom spremanja djeteta.');
     }
   };
 
@@ -126,14 +145,34 @@ const MasterDetailPage = () => {
     }
   };
 
+  const handleCreateDijete = async () => {
+    const novo = {
+      idDijete: null,
+      ime: '',
+      prezime: '',
+      oib: '',
+      datumRodenja: '',
+      mjestoRodenja: '',
+      adresaStanovanja: '',
+      mbo: '',
+      idSkupina: '',
+      roditelj1Id: '',
+      roditelj2Id: '',
+    };
+    setFormData(novo);
+    setDijete(null); // Oznaka da je novo
+  }
+  
+
+
   const handleEditEvidencija = (item) => {
     setEditingEvidencija(item);
   };
 
 const handleSaveEvidencija = async (updated) => {
   try {
-    // Pretpostavljam da imaš API funkciju za update evidencije:
     await updateEvidencija(updated);
+    toast.success('Evidencija uspješno ažurirana!');
 
     setEvidencija(prev => prev.map(el =>
       el.idEvidencijskaLista === updated.idEvidencijskaLista ? updated : el
@@ -141,6 +180,8 @@ const handleSaveEvidencija = async (updated) => {
     setEditingEvidencija(null);
   } catch (err) {
     console.error('Greška pri spremanju evidencije:', err);
+    toast.error('Došlo je do pogreške prilikom spremanja promjena!');
+
   }
 };
 
@@ -155,13 +196,18 @@ const handleDeleteEvidencija = (id) => {
 }
 
 const handleAddEvidencija = async (newRecord) => {
+  console.log(newRecord)
   try {
-     const maxId = evidencija.reduce((max, el) => (el.idEvidencijskaLista > max ? el.idEvidencijskaLista : max), 0);
-    const recordWithId = { ...newRecord, idEvidencijskaLista: maxId + 1 };
-    const createdRecord = await createEvidencija(recordWithId);
-    setEvidencija(prev => [...prev, createdRecord]);
+    const maxId = evidencija.reduce((max, el) => (el.idEvidencijskaLista > max ? el.idEvidencijskaLista : max), 0);
+    const recordWithId = { ...newRecord, idEvidencijskaLista: maxId + 1,     };
+    const recordWithIdChild = {...recordWithId, idDijete: dijete.idDijete,}
+    await createEvidencija(recordWithIdChild);
+    toast.success('Evidencija uspješno kreirana!')
+    setEvidencija(prev => [...prev, recordWithId]);
   } catch (err) {
     console.error('Greška pri dodavanju novog zapisa:', err);
+    toast.error('Došlo je do pogreške!')
+
   }
 };
 
@@ -181,6 +227,7 @@ const handleAddEvidencija = async (newRecord) => {
           handleSave={handleSave}
           handleCancel={handleCancel}
           onDelete={handleDelete}
+          handleCreate={handleCreateDijete}
         />
       </section>
 
