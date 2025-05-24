@@ -2,6 +2,16 @@ const handleResponse = async (res) => {
   if (res.status === 204) {
     return [];
   }
+
+  if (res.status === 201) {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text;
+    }
+  }
+
   if (!res.ok) {
     const errorText = await res.text();
     throw new Error(`Greška ${res.status}: ${res.statusText} - ${errorText}`);
@@ -23,17 +33,17 @@ export const getDijeteById = async (id) => {
 
 export const updateDijete = async (dijete) => {
   const res = await fetch(`${BASE_URL}/api/djeca/dijete/${dijete.idDijete}`, {
-     method: 'PUT',
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(dijete), 
-  })
-    if (!res.ok) {
+    body: JSON.stringify(dijete),
+  });
+  if (!res.ok) {
     const errorText = await res.text();
     throw new Error(`Greška ${res.status}: ${res.statusText} - ${errorText}`);
   }
-}
+};
 
 export const deleteDijeteById = async (id) => {
   const res = await fetch(`${BASE_URL}/api/djeca/dijete/${id}`, {
@@ -43,16 +53,14 @@ export const deleteDijeteById = async (id) => {
     const errorText = await res.text();
     throw new Error(`Greška ${res.status}: ${res.statusText} - ${errorText}`);
   }
-}
+};
 
-export const createDijete = async () => {
-  
-}
+export const createDijete = async () => {};
 
-export const getRoditelji = async () =>  {
+export const getRoditelji = async () => {
   const res = await fetch(`${BASE_URL}/api/roditelji`);
   return res.json();
-}
+};
 
 export const getEvidencijaByDijeteId = async (id) => {
   const res = await fetch(`${BASE_URL}/api/evidencija/dijete/${id}`);
@@ -70,27 +78,74 @@ export const deleteEvidencija = async (id) => {
 };
 
 export const updateEvidencija = async (evidencija) => {
-  const res = await fetch(`${BASE_URL}/api/evidencija/${evidencija.idEvidencijskaLista}`, {
-     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(evidencija), 
-  })
-    if (!res.ok) {
+  const res = await fetch(
+    `${BASE_URL}/api/evidencija/${evidencija.idEvidencijskaLista}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(evidencija),
+    }
+  );
+  if (!res.ok) {
     const errorText = await res.text();
     throw new Error(`Greška ${res.status}: ${res.statusText} - ${errorText}`);
   }
-}
+};
 
 export const createEvidencija = async (evidencija) => {
-  const res = await fetch(`${BASE_URL}/api/evidencija/dijete/${evidencija.idDijete}`, {
+  const res = await fetch(
+    `${BASE_URL}/api/evidencija/dijete/${evidencija.idDijete}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(evidencija),
+    }
+  );
+  return res.json(); // !!!!!!!!!!
+};
+
+export const createRoditelj = async (roditelj) => {
+  const res = await fetch(`${BASE_URL}/api/roditelji`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(evidencija), 
-})
-   return res.json() // !!!!!!!!!!
+    body: JSON.stringify(roditelj),
+  });
+  return handleResponse(res);
+};
 
-}
+export const deleteRoditelj = async (id) => {
+  const res = await fetch(`${BASE_URL}/api/roditelji/roditelj/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (res.status === 204) return;
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Greška ${res.status}: ${res.statusText} - ${errorText}`);
+  }
+};
+
+export const updateRoditelj = async (id, roditelj) => {
+  const res = await fetch(`${BASE_URL}/api/roditelji/roditelj/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(roditelj),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Greška ${res.status}: ${res.statusText} - ${errorText}`);
+  }
+  return res.text();
+};

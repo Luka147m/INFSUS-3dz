@@ -1,0 +1,16 @@
+.sifrarnik-page {
+  padding: 2rem;
+  max-width: 90vw;
+  margin: auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sifrarnik-section {
+  margin-bottom: 2rem;
+}
+
+h2,
+h3 {
+  color: #222;
+  margin-bottom: 1rem;
+}

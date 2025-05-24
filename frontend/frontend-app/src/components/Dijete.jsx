@@ -89,7 +89,7 @@ const Dijete = ({ formData, roditelji, handleChange, handleSave, handleCancel, h
           <button
             className="button new"
             onClick={handleCreate}
-            style={{ marginLeft: 'auto' }}  // <-- Ovo pomiče gumb Novo dijete skroz desno
+            style={{ marginLeft: 'auto' }}
           >
             ➕ Novo dijete
           </button>

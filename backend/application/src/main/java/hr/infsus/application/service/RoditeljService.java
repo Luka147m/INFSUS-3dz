@@ -65,18 +65,27 @@ public class RoditeljService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Roditelj not found"));
 
 		Korisnik korisnik = roditelj.getKorisnik();
-		korisnik.setIme(dto.getIme());
-		korisnik.setPrezime(dto.getPrezime());
-		korisnik.setEmail(dto.getEmail());
-		korisnik.setBrojTelefona(dto.getBrojTelefona());
-		korisnik.setLozinka(dto.getLozinka());
-		korisnik.setUloga(dto.getUloga());
+		if (dto.getIme() != null)
+			korisnik.setIme(dto.getIme());
+		if (dto.getPrezime() != null)
+			korisnik.setPrezime(dto.getPrezime());
+		if (dto.getEmail() != null)
+			korisnik.setEmail(dto.getEmail());
+		if (dto.getBrojTelefona() != null)
+			korisnik.setBrojTelefona(dto.getBrojTelefona());
+		if (dto.getLozinka() != null)
+			korisnik.setLozinka(dto.getLozinka());
+		if (dto.getUloga() != null)
+			korisnik.setUloga(dto.getUloga());
 
 		korisnikRepository.save(korisnik);
 
-		roditelj.setZanimanje(dto.getZanimanje());
-		roditelj.setRadnoMjesto(dto.getRadnoMjesto());
-		roditelj.setOib(dto.getOib());
+		if (dto.getZanimanje() != null)
+			roditelj.setZanimanje(dto.getZanimanje());
+		if (dto.getRadnoMjesto() != null)
+			roditelj.setRadnoMjesto(dto.getRadnoMjesto());
+		if (dto.getOib() != null)
+			roditelj.setOib(dto.getOib());
 
 		roditeljRepository.save(roditelj);
 
