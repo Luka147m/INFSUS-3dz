@@ -40,6 +40,7 @@ const MasterDetailPage = () => {
         roditelj2Id: dijeteData.imenik?.roditelj2?.idRoditelj || ''
       };
       setDijete(dijeteData);
+      console.log(dijeteData)
       setFormData(mapped);
     } catch (err) {
       console.error('Greška prilikom dohvaćanja djeteta:', err);
@@ -91,11 +92,11 @@ const MasterDetailPage = () => {
       }
 
     try {
-      const { roditelj1Id, roditelj2Id, ...rest } = formData; // izdvoji nepotrebna polja
+      const { roditelj1Id, roditelj2Id, ...rest } = formData; 
 
        const toSave = {
           idDijete: formData.idDijete,
-          idSkupina: formData.idSkupina || 1, // ili koji već treba
+          idSkupina: formData.idSkupina || 1, 
           ime: formData.ime,
           prezime: formData.prezime,
           oib: formData.oib,
@@ -113,7 +114,7 @@ const MasterDetailPage = () => {
           setIds(newIds);
           const newIndex = newIds.length - 1;
           setCurrentIndex(newIndex); 
-          await loadData(newIds[newIndex]); // učitaj novo dijete
+          await loadData(newIds[newIndex]); 
 
         } else {
           await updateDijete(toSave);
@@ -160,7 +161,7 @@ const MasterDetailPage = () => {
       roditelj2Id: '',
     };
     setFormData(novo);
-    setDijete(null); // Oznaka da je novo
+    setDijete(null); 
   }
   
 
@@ -185,9 +186,6 @@ const handleSaveEvidencija = async (updated) => {
   }
 };
 
-const handleCancelEdit = () => {
-  setEditingEvidencija(null);
-};  
 
 const handleDeleteEvidencija = (id) => {
               deleteEvidencija(id)

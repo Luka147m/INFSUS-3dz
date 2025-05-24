@@ -1,3 +1,4 @@
+
 import React from 'react';
 import '../styles/Dijete.css';
 
@@ -17,27 +18,7 @@ const Dijete = ({ formData, roditelji, handleChange, handleSave, handleCancel, o
           <input name="prezime" value={formData.prezime} onChange={handleChange} />
         </label>
 
-        <label>
-          OIB:
-          <input name="oib" value={formData.oib} onChange={handleChange} />
-        </label>
-
-        <label>
-          Mjesto rođenja:
-          <input name="mjestoRodenja" value={formData.mjestoRodenja} onChange={handleChange} />
-        </label>
-
-        <label>
-          Adresa stanovanja:
-          <input name="adresaStanovanja" value={formData.adresaStanovanja} onChange={handleChange} />
-        </label>
-
-        <label>
-          MBO:
-          <input name="mbo" value={formData.mbo} onChange={handleChange} />
-        </label>
-
-        <label>
+         <label>
           Datum rođenja:
           <input
             type="date"
@@ -47,6 +28,26 @@ const Dijete = ({ formData, roditelji, handleChange, handleSave, handleCancel, o
           />
         </label>
 
+        <label>
+          Mjesto rođenja:
+          <input name="mjestoRodenja" value={formData.mjestoRodenja} onChange={handleChange} />
+        </label>
+        
+        <label>
+          Adresa stanovanja:
+          <input name="adresaStanovanja" value={formData.adresaStanovanja} onChange={handleChange} />
+        </label>
+        
+        <label>
+          OIB:
+          <input name="oib" value={formData.oib} onChange={handleChange} />
+        </label>
+
+        <label>
+          MBO:
+          <input name="mbo" value={formData.mbo} onChange={handleChange} />
+        </label>
+        
         <label>
           Roditelj 1:
           <select name="roditelj1Id" value={formData.roditelj1Id || ''} onChange={handleChange}>

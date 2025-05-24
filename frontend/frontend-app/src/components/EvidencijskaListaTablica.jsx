@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles/EvidencijskaListaTablica.css'
 
 const EvidencijskaListaTablica = ({ lista, onEdit, onDelete, onSave, onAdd }) => {
   const [editId, setEditId] = useState(null);
