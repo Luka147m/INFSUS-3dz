@@ -68,21 +68,15 @@ public class DijeteControllerTest {
 
 		String json = objectMapper.writeValueAsString(dto);
 
-		mockMvc.perform(post("/api/djeca")
+		String response = mockMvc.perform(post("/api/djeca")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(json))
-				.andExpect(status().isCreated());
-
-		String idListJson = mockMvc.perform(get("/api/djeca/ids"))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
 				.andReturn()
 				.getResponse()
 				.getContentAsString();
 
-		// Pretvori JSON array u listu Integera
-		ObjectMapper mapper = new ObjectMapper();
-		List<Integer> idList = Arrays.asList(mapper.readValue(idListJson, Integer[].class));
-		testDijeteId = idList.get(idList.size() - 1);
+		testDijeteId = Integer.valueOf(response);
 	}
 
 	@Test

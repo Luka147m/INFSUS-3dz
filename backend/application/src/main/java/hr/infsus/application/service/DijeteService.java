@@ -50,7 +50,7 @@ public class DijeteService {
 		return dijete.map(DijeteMapper::toDTO);
 	}
 
-	public String createDijete(DijeteRequestDTO dto) {
+	public Integer createDijete(DijeteRequestDTO dto) {
 		@SuppressWarnings("unused")
 		Skupina skupina = skupinaRepository.findById(dto.getIdSkupina())
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Skupina not found"));
@@ -81,8 +81,7 @@ public class DijeteService {
 
 		imenik = imenikRepository.save(imenik);
 
-		return "Success";
-
+		return dijete.getIdDijete();
 	}
 
 	public String updateDijete(DijeteRequestDTO dto, Integer id) {

@@ -44,8 +44,8 @@ public class DijeteController {
 
 	@PostMapping
 	public ResponseEntity<String> createDijete(@RequestBody DijeteRequestDTO dto) {
-		String savedDijete = dijeteService.createDijete(dto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(savedDijete);
+		Integer savedDijete = dijeteService.createDijete(dto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(savedDijete.toString());
 	}
 
 	// Dohvat pojedinog djeteta preko ID
