@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   getDjecaIds,
+  getDjeca,
   getDijeteById,
   updateDijete,
   createDijete,
@@ -9,7 +10,7 @@ import {
 } from '../api';
 
 import '../styles/MasterDetailPage.css';
-
+import Search from '../components/Search';
 import Navigator from '../components/Navigator';
 import Dijete from '../components/Dijete';
 import EvidencijskaListaTable from '../components/EvidencijskaListaTablica';
@@ -18,6 +19,7 @@ import { toast } from 'react-toastify';
 
 const MasterDetailPage = () => {
   const [ids, setIds] = useState([]);
+  const [djeca, setDjeca] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dijete, setDijete] = useState(null);
   const [evidencija, setEvidencija] = useState([]);
@@ -27,13 +29,13 @@ const MasterDetailPage = () => {
 
 
   const validateImePrezime = (value) => /^[A-Za-zčćžšđČĆŽŠĐ -]{1,50}$/.test(value);
-    const validateDatum = (value) => !!value; 
-    const validateMjesto = (value) => value && value.length <= 50;
-    const validateAdresa = (value) => value && value.length <= 100;
-    const validateOIB = (value) => /^\d{11}$/.test(value);
-    const validateMBO = (value) => /^\d{9}$/.test(value); 
-  
-    const validateForm = (form) => {
+  const validateDatum = (value) => !!value; 
+  const validateMjesto = (value) => value && value.length <= 50;
+  const validateAdresa = (value) => value && value.length <= 100;
+  const validateOIB = (value) => /^\d{11}$/.test(value);
+  const validateMBO = (value) => /^\d{9}$/.test(value); 
+
+  const validateForm = (form) => {
     if (!validateImePrezime(form.ime)) return 'Ime smije sadržavati samo slova, razmake i crticu, max 50 znakova.';
     if (!validateImePrezime(form.prezime))  return 'Prezime smije sadržavati samo slova, razmake i crticu, max 50 znakova.';
     if (!validateDatum(form.datumRodenja)) return 'Datum rođenja je obavezan.';
@@ -41,6 +43,8 @@ const MasterDetailPage = () => {
     if (!validateAdresa(form.adresaStanovanja)) return 'Adresa mora biti ispravna (max 100 znakova).';
     if (!validateOIB(form.oib)) return 'OIB mora imati točno 11 znamenki.';
     if (!validateMBO(form.mbo)) return 'MBO mora imati točno 9 znamenki.';
+    if (!form.roditelj1Id) return 'Roditelj 1 mora biti odabran.';
+    if (!form.roditelj2Id) return 'Roditelj 2 mora biti odabran.';
     return null; 
   };
 
@@ -70,16 +74,29 @@ const MasterDetailPage = () => {
     }
   };
 
-  useEffect(() => {
-    getDjecaIds()
-      .then(data => {
-        setIds(data);
-        if (data.length > 0) {
-          loadData(data[0]);
-        }
-      })
-      .catch(err => console.error('Greška prilikom dohvaćanja ID-jeva:', err));
+ useEffect(() => {
+  getDjecaIds()
+    .then(data => {
+      setIds(data);
+      if (data.length > 0) {
+        loadData(data[0]);
+      }
+    })
+    .catch(err => console.error('Greška prilikom dohvaćanja ID-jeva:', err));
+
+  getDjeca()
+    .then(data => {
+      const djecaData = data.map(dijete => ({
+        id: dijete.idDijete,
+        ime: dijete.ime,
+        prezime: dijete.prezime,
+        oib: dijete.oib
+      }));
+      setDjeca(djecaData);
+    })
+    .catch(err => console.error('Greška prilikom dohvaćanja podataka o djeci:', err));
   }, []);
+
 
   useEffect(() => {
     if (ids.length > 0) {
@@ -132,10 +149,28 @@ const MasterDetailPage = () => {
           setCurrentIndex(newIndex); 
           await loadData(newIds[newIndex]); 
 
+          const allDjeca = await getDjeca();
+          const djecaData = allDjeca.map(dijete => ({
+            id: dijete.idDijete,
+            ime: dijete.ime,
+            prezime: dijete.prezime,
+            oib: dijete.oib
+          }));
+          setDjeca(djecaData);
+
         } else {
           await updateDijete(toSave);
           toast.success('Dijete uspješno ažurirano!');
           setDijete(toSave);
+
+          const allDjeca = await getDjeca();
+          const djecaData = allDjeca.map(dijete => ({
+            id: dijete.idDijete,
+            ime: dijete.ime,
+            prezime: dijete.prezime,
+            oib: dijete.oib
+          }));
+          setDjeca(djecaData);
     }
     } catch (err) {
       console.error(err);
@@ -148,6 +183,7 @@ const MasterDetailPage = () => {
 
   return (
     <div className="master-page">
+      <Search djeca={djeca} ids={ids} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} />
       <Navigator ids={ids} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} />
 
       <section className="dijete-section">
@@ -170,7 +206,6 @@ const MasterDetailPage = () => {
       <section className="evidencija-section">
         <h3>Evidencijska lista</h3>
         <EvidencijskaListaTable
-            lista={evidencija}
             evidencija={evidencija}
             dijete={dijete}
             setEvidencija={setEvidencija} 

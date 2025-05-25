@@ -5,7 +5,7 @@
 -- Dumped from database version 16.0
 -- Dumped by pg_dump version 16.0
 
--- Started on 2025-04-10 14:26:50
+-- Started on 2025-05-25 14:16:04
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -30,12 +30,12 @@ SET default_table_access_method = heap;
 CREATE TABLE public.dijete (
     id_dijete integer NOT NULL,
     id_skupina integer,
-    ime character varying(50),
-    prezime character varying(50),
-    oib character varying(11),
-    mjesto_rodenja character varying(100),
+    ime character varying(255),
+    prezime character varying(255),
+    oib character varying(255),
+    mjesto_rodenja character varying(255),
     adresa_stanovanja character varying(255),
-    mbo character varying(20),
+    mbo character varying(255),
     datum_rodenja date
 );
 
@@ -123,8 +123,8 @@ CREATE TABLE public.evidencijskalista (
     id_odgojitelj integer,
     datum date,
     prisutan boolean,
-    program text,
-    napomena text
+    program character varying(255),
+    napomena character varying(255)
 );
 
 
@@ -164,7 +164,7 @@ CREATE TABLE public.imenik (
     id_imenik integer NOT NULL,
     id_roditelj1 integer,
     id_roditelj2 integer,
-    id_dijete integer
+    id_dijete integer NOT NULL
 );
 
 
@@ -202,12 +202,12 @@ ALTER SEQUENCE public.imenik_id_imenik_seq OWNED BY public.imenik.id_imenik;
 
 CREATE TABLE public.korisnik (
     id_korisnik integer NOT NULL,
-    ime character varying(50) NOT NULL,
-    prezime character varying(50) NOT NULL,
-    email character varying(100) NOT NULL,
-    broj_telefona character varying(20),
-    lozinka text NOT NULL,
-    uloga character varying(30) NOT NULL
+    ime character varying(255) NOT NULL,
+    prezime character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    broj_telefona character varying(255),
+    lozinka character varying(255) NOT NULL,
+    uloga character varying(255) NOT NULL
 );
 
 
@@ -487,9 +487,9 @@ ALTER SEQUENCE public.razvojnamapa_id_razvojne_mape_seq OWNED BY public.razvojna
 CREATE TABLE public.roditelj (
     id_roditelj integer NOT NULL,
     id_korisnik integer,
-    zanimanje character varying(100),
-    radno_mjesto character varying(100),
-    oib character varying(11)
+    zanimanje character varying(255),
+    radno_mjesto character varying(255),
+    oib character varying(255)
 );
 
 
@@ -540,7 +540,8 @@ ALTER TABLE public.roditeljobavijest OWNER TO postgres;
 
 CREATE TABLE public.skupina (
     id_skupina integer NOT NULL,
-    naziv character varying(100)
+    naziv character varying(100),
+    ime character varying(255)
 );
 
 
@@ -780,9 +781,11 @@ ALTER TABLE ONLY public.zdravstvenidjelatnik ALTER COLUMN id_zdravstveni_djelatn
 --
 
 COPY public.dijete (id_dijete, id_skupina, ime, prezime, oib, mjesto_rodenja, adresa_stanovanja, mbo, datum_rodenja) FROM stdin;
-1	1	Borna	Novak	12345238912	Požega	Školska 123a	654321159465	2019-04-10
-2	1	Bruno	Petrović	12345233412	Slavonski brod	Domovinska 43	654651159465	2019-09-08
-3	1	Tina	Babić	12345255412	Slavonski brod	Petrova ulica 4	344651159465	2019-12-11
+1	1	Borna	Novak	12345238912	Požega	Školska 123a	546325896	2019-04-10
+2	1	Bruno	Petrović	12345233412	Slavonski brod	Domovinska 43	986532569	2019-09-08
+3	1	Tina	Babić	12345255412	Slavonski brod	Petrova ulica 4	863263514	2019-12-11
+18	1	Petar	Novak	12342238912	Zagreb	Petrovska 123a	986325628	2019-04-10
+19	1	Leon	Novak	12342238912	Zagreb	Petrovska 123a	986325749	2019-04-10
 \.
 
 
@@ -803,9 +806,12 @@ COPY public.dnevnikdana (id_dnevnik_dana, id_plan_tjedna, brojdjece, zapazanja, 
 --
 
 COPY public.evidencijskalista (id_evidencijska_lista, id_dijete, id_odgojitelj, datum, prisutan, program, napomena) FROM stdin;
-1	1	1	2025-04-11	t	cjelodnevni	
-2	2	1	2025-04-11	t	poludnevni	
-3	3	1	2025-04-11	f		Roditelj javio da dijete ima vodene kozice
+9	1	2	2025-05-06	f	-	bolestan (prijavio Roditelj)
+7	1	5	2024-05-22	t	poludnevni	kikiriki alergija
+2	2	1	2025-04-11	t	poludnevni	-
+3	3	1	2025-04-11	f	-	Roditelj javio da dijete ima vodene kozice
+27	18	5	2025-05-13	t	cjelodnevni	Baka će pokupiti dijete zbog odsutnosti roditelja
+28	19	4	2025-05-05	t	poludnevni	Izgubio je zub tijekom boravka u vrtiću
 \.
 
 
@@ -819,6 +825,8 @@ COPY public.imenik (id_imenik, id_roditelj1, id_roditelj2, id_dijete) FROM stdin
 1	1	2	1
 2	3	4	2
 3	5	6	3
+10	5	6	18
+11	3	4	19
 \.
 
 
@@ -841,8 +849,9 @@ COPY public.korisnik (id_korisnik, ime, prezime, email, broj_telefona, lozinka, 
 11	Tomislav	Petrović	tomislav.petrovic@gmail.com	098 900 553	$2b$10$qDpsq6oj/fNRKFC/7VyMwegun.KAizXZCj8p1l6gErC2gql4/UbLG	roditelj
 12	Marija	Tomić	marija.tomic@gmail.com	098 900 554	$2b$10$cqNP77Ae4aBMlUn6/2zLBuzq6dS5AURcudYlcKBp43nsJLNay0iVK	roditelj
 13	Jana	Kovačić	jana.kovacic@gmail.com	098 900 555	$2b$10$2MGD1SBDNzj7XYqVECKp..RUiQVrFA32Pm2HapoR7Hdm.S.AvQZ7i	roditelj
-14	Karlo	Babić	karlo.babic@gmail.com	098 900 556	$2b$10$9jXgz47NO79Vn8uNHyVDtOiYaDnrswzTgjAghLe7A5SwW..jAEU4y	roditelj
 15	Renata	Matić	renata.matic@zdravlje.com	098 900 546	$2b$10$sCbRF4HiL2R3vQYbXMpR7.5/t6vv7kF88PldFUdqbkGbkeVVZbaHa	zdravstveni djelatnik
+14	Marko	Babić	marko.babić@example.com	+385912345673	tajnaLozinka123	RODITELJ
+29	Petar	Horvat	petar.horvat@gmail.com	+385962354125	supertajnaloyinka	Roditelj
 \.
 
 
@@ -925,7 +934,8 @@ COPY public.roditelj (id_roditelj, id_korisnik, zanimanje, radno_mjesto, oib) FR
 3	11	Građevinski radnik	Firma beton Sava	14375678912
 4	12	Prodavačica	Studenac	14375678982
 5	13	Prodavačica	Konzum	14375678985
-6	14	Trener	Sportski klub Zagreb	14335678985
+6	14	Inženjer	Zagrebačka tvrtka d.o.o.	12345678901
+20	29	Stolar	Drva Dabar	56231245862
 \.
 
 
@@ -945,9 +955,9 @@ COPY public.roditeljobavijest (id_roditelj, id_obavijest) FROM stdin;
 -- Data for Name: skupina; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.skupina (id_skupina, naziv) FROM stdin;
-1	Žute pčelice
-2	Pospani medeki
+COPY public.skupina (id_skupina, naziv, ime) FROM stdin;
+1	Žute pčelice	\N
+2	Pospani medeki	\N
 \.
 
 
@@ -978,7 +988,7 @@ COPY public.zdravstvenidjelatnik (id_zdravstveni_djelatnik, id_korisnik) FROM st
 -- Name: dijete_id_dijete_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.dijete_id_dijete_seq', 3, true);
+SELECT pg_catalog.setval('public.dijete_id_dijete_seq', 21, true);
 
 
 --
@@ -996,7 +1006,7 @@ SELECT pg_catalog.setval('public.dnevnikdana_id_dnevnik_dana_seq', 1, false);
 -- Name: evidencijskalista_id_evidencijska_lista_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.evidencijskalista_id_evidencijska_lista_seq', 3, true);
+SELECT pg_catalog.setval('public.evidencijskalista_id_evidencijska_lista_seq', 28, true);
 
 
 --
@@ -1005,7 +1015,7 @@ SELECT pg_catalog.setval('public.evidencijskalista_id_evidencijska_lista_seq', 3
 -- Name: imenik_id_imenik_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.imenik_id_imenik_seq', 3, true);
+SELECT pg_catalog.setval('public.imenik_id_imenik_seq', 13, true);
 
 
 --
@@ -1014,7 +1024,7 @@ SELECT pg_catalog.setval('public.imenik_id_imenik_seq', 3, true);
 -- Name: korisnik_id_korisnik_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.korisnik_id_korisnik_seq', 15, true);
+SELECT pg_catalog.setval('public.korisnik_id_korisnik_seq', 29, true);
 
 
 --
@@ -1077,7 +1087,7 @@ SELECT pg_catalog.setval('public.razvojnamapa_id_razvojne_mape_seq', 1, false);
 -- Name: roditelj_id_roditelj_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.roditelj_id_roditelj_seq', 6, true);
+SELECT pg_catalog.setval('public.roditelj_id_roditelj_seq', 20, true);
 
 
 --
@@ -1126,7 +1136,7 @@ ALTER TABLE ONLY public.dnevnikdana
 
 
 --
--- TOC entry 4802 (class 2606 OID 56083)
+-- TOC entry 4804 (class 2606 OID 56083)
 -- Name: evidencijskalista evidencijskalista_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1153,7 +1163,7 @@ ALTER TABLE ONLY public.korisnik
 
 
 --
--- TOC entry 4794 (class 2606 OID 56021)
+-- TOC entry 4796 (class 2606 OID 56021)
 -- Name: obavijest obavijest_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1198,7 +1208,7 @@ ALTER TABLE ONLY public.ravnatelj
 
 
 --
--- TOC entry 4798 (class 2606 OID 56045)
+-- TOC entry 4800 (class 2606 OID 56045)
 -- Name: razvojnamapa razvojnamapa_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1216,7 +1226,7 @@ ALTER TABLE ONLY public.roditelj
 
 
 --
--- TOC entry 4796 (class 2606 OID 56026)
+-- TOC entry 4798 (class 2606 OID 56026)
 -- Name: roditeljobavijest roditeljobavijest_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1234,16 +1244,16 @@ ALTER TABLE ONLY public.skupina
 
 
 --
--- TOC entry 4804 (class 2606 OID 56085)
--- Name: evidencijskalista unique_evidencija; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 4794 (class 2606 OID 56485)
+-- Name: imenik unique_id_dijete; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.evidencijskalista
-    ADD CONSTRAINT unique_evidencija UNIQUE (id_dijete, datum);
+ALTER TABLE ONLY public.imenik
+    ADD CONSTRAINT unique_id_dijete UNIQUE (id_dijete);
 
 
 --
--- TOC entry 4800 (class 2606 OID 56064)
+-- TOC entry 4802 (class 2606 OID 56064)
 -- Name: zdravstvenaevidencija zdravstvenaevidencija_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1440,7 +1450,7 @@ ALTER TABLE ONLY public.zdravstvenidjelatnik
     ADD CONSTRAINT zdravstvenidjelatnik_id_korisnik_fkey FOREIGN KEY (id_korisnik) REFERENCES public.korisnik(id_korisnik);
 
 
--- Completed on 2025-04-10 14:26:53
+-- Completed on 2025-05-25 14:16:06
 
 --
 -- PostgreSQL database dump complete

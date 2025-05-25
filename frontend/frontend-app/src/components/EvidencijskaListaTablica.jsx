@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 import '../styles/EvidencijskaListaTablica.css'
 import {
+  getEvidencijaByDijeteId,
   updateEvidencija,
   deleteEvidencija,
   createEvidencija
-
 } from '../api';
 
-const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, setEditingEvidencija}) => {
+import { getOdgojitelji } from '../api';
+
+const EvidencijskaListaTablica = ({ evidencija, dijete, setEvidencija, setEditingEvidencija}) => {
   const [editId, setEditId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
   const [isAdding, setIsAdding] = useState(false);
@@ -21,10 +23,17 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
     napomena: ''
   });
   const [validationError, setValidationError] = useState('');
+  const [odgojitelji, setOdgojitelji] = useState([]);
+
+  useEffect(() => {
+    getOdgojitelji()
+      .then(data => setOdgojitelji(data))
+      .catch(err => console.error('Greška pri učitavanju odgojitelja:', err));
+  }, []);
 
   const validateForm = (formData) => {
-      if (!formData.idOdgojitelj || formData.idOdgojitelj.trim() === '') {
-        return 'Odgojitelj je obavezan.';
+      if (!formData.idOdgojitelj) {
+        return 'Odgojitelj je obavezan.'; 
       }
       if (!formData.datum || formData.datum.trim() === '') {
         return 'Datum je obavezan.';
@@ -38,6 +47,10 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
       }
       if (!formData.program || formData.program.trim() === '') {
         return 'Program je obavezan.';
+      }
+
+      if (formData.napomena.trim().length > 150) {
+        return 'Napomena ne smije biti duža od 150 znakova.';
       }
       return '';
 };
@@ -135,10 +148,9 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
     }
   };
 
-  const handleEditEvidencija = (item) => {
-    setEditingEvidencija(item);
-  };
-
+  // const handleEditEvidencija = (item) => {
+  //   setEditingEvidencija(item);
+  // };
   
   const handleDeleteEvidencija = (id) => {
     deleteEvidencija(id)
@@ -147,14 +159,22 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
   }
 
   const handleAddEvidencija = async (newRecord) => {
-    console.log(newRecord)
+    // console.log(newRecord)
     try {
-      const maxId = evidencija.reduce((max, el) => (el.idEvidencijskaLista > max ? el.idEvidencijskaLista : max), 0);
-      const recordWithId = { ...newRecord, idEvidencijskaLista: maxId + 1,     };
-      const recordWithIdChild = {...recordWithId, idDijete: dijete.idDijete,}
-      await createEvidencija(recordWithIdChild);
+      // const maxId = evidencija.reduce((max, el) => (el.idEvidencijskaLista > max ? el.idEvidencijskaLista : max), 0);
+      // const recordWithId = { ...newRecord, idEvidencijskaLista: maxId + 1,     };
+      // const recordWithIdChild = {...recordWithId, idDijete: dijete.idDijete,}
+      const recordWithId = { ...newRecord, idDijete: dijete.idDijete };
+      await createEvidencija(recordWithId);
       toast.success('Evidencija uspješno kreirana!')
-      setEvidencija(prev => [...prev, recordWithId]);
+      try {
+        const evidencijaData = await getEvidencijaByDijeteId(dijete.idDijete);
+        setEvidencija(evidencijaData);
+      } catch (err) {
+        console.error('Greška prilikom dohvaćanja evidencije:', err);
+        setEvidencija([]);
+      }
+      // setEvidencija(prev => [...prev, recordWithId]);
     } catch (err) {
       console.error('Greška pri dodavanju novog zapisa:', err);
       toast.error('Došlo je do pogreške!')
@@ -193,13 +213,18 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
             <tr>
               <td>—</td>
               <td>
-                <input
-                  type="text"
+                <select
                   name="idOdgojitelj"
                   value={newFormData.idOdgojitelj}
                   onChange={handleNewChange}
-                  placeholder="ID odgojitelja"
-                />
+                >
+                <option value="">-- Odaberite odgojitelja --</option>
+                {odgojitelji.map(o => (
+                  <option key={o.idOdgojitelj} value={o.idOdgojitelj}>
+                    {o.idOdgojitelj} {o.ime} {o.prezime}
+                  </option>
+                ))}
+                </select>
               </td>
               <td>
                 <input
@@ -240,10 +265,26 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
             </tr>
           )}
 
-          {lista.map(item => (
+          {evidencija.map(item => (
             <tr key={item.idEvidencijskaLista}>
               <td>{item.idEvidencijskaLista}</td>
-              <td>{item.idOdgojitelj}</td>
+              <td>
+                {editId === item.idEvidencijskaLista ? (
+                  <select
+                    name="idOdgojitelj"
+                    value={editFormData.idOdgojitelj}
+                    onChange={handleChange}
+                  >
+                    {odgojitelji.map(o => (
+                      <option key={o.idOdgojitelj} value={o.idOdgojitelj}>
+                        {o.idOdgojitelj} {o.ime} {o.prezime}
+                      </option>
+                    ))}
+                  </select>
+                ) : 
+                  item.idOdgojitelj
+                }
+              </td>
               <td>
                 {editId === item.idEvidencijskaLista ? (
                   <input
@@ -278,7 +319,7 @@ const EvidencijskaListaTablica = ({ lista, evidencija, dijete, setEvidencija, se
                   item.program
                 )}
               </td>
-              <td>
+              <td className="napomena-cell">
                 {editId === item.idEvidencijskaLista ? (
                   <input
                     type="text"
