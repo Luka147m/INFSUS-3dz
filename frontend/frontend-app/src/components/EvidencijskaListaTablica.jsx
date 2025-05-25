@@ -39,7 +39,7 @@ const EvidencijskaListaTablica = ({ evidencija, dijete, setEvidencija, setEditin
         return 'Datum je obavezan.';
       }
       const danas = new Date();
-      danas.setHours(0,0,0,0); 
+      danas.setHours(23,59,59,59); 
       const uneseniDatum = new Date(formData.datum);
 
       if (uneseniDatum > danas) {

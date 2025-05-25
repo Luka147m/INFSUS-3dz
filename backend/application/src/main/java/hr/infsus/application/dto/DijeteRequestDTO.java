@@ -13,7 +13,7 @@ public class DijeteRequestDTO {
 	private LocalDate datumRodenja;
 	private Integer idRoditelj1;
 	private Integer idRoditelj2;
-
+	
 	public Integer getIdSkupina() {
 		return idSkupina;
 	}
